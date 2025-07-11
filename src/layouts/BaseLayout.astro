@@ -103,7 +103,7 @@ const combinedJsonLdSchemas = [
         {combinedJsonLdSchemas.map((schema) => (
             <script type="application/ld+json" set:html={JSON.stringify(schema)} />
         ))}
-        <link rel="stylesheet" href="/global.css" />
+        <link rel="stylesheet" href={`${url}/global.css`} />
         </head>
     <body>
         <header>

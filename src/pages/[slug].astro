@@ -188,6 +188,10 @@ const schemaWebPage = {
   "url": `${url}/${slugify(video.title)}-${video.id}/`,
   "name": `${video.title}`,
   "description": `Nonton streaming video bokep viral ${video.title} yang terbaru di link ${nama} kategori ${video.category}.`,
+  "image": {
+    "@type": "ImageObject",
+    "url": video.thumbnail
+  },
   "publisher": {
     "@type": "Organization",
     "name": nama,
@@ -303,15 +307,11 @@ const videoTags = typeof video.tags === 'string' && video.tags.length > 0
     <p>Situs {nama} adalah sumber utama untuk nonton video streaming terbaru dan terlengkap secara gratis. Kami menyediakan koleksi video yang beragam, termasuk konten viral dari Bokep Indo, Jepang, Jav, dan Barat. Anda bisa menemukan video terbaru seperti bocil ngentot, jilbab SMP, mama, SMA, simontok, dan berbagai genre lainnya. Nikmati juga berbagai kategori populer seperti hub, sotwe, olmek, avtube, pijat, gudang, pemerkosaan, rumah, tobrut, inggris, ngintip, vcs, binor, yandex update, remaja, serta video full porno dan ngentot.</p>
     <p>Jelajahi koleksi kami yang meliputi konten dari Xxx, Xnxx, Xvideos, Xhamster, Youporn, Pornhub, termasuk video jilbab ngintip, bokep barat, dan nobokep indo. Kami juga menyediakan akses untuk download video colmek toket ABG hot, coli kontol ipar, nonton film binor terbaru, tetangga sange, live asia toge meki bugil montok putih mulus, sex seragam, bokep69, janda muda, dan adegan intim lainnya.</p>
     <p>Temukan video seperti bocil ngocok, SMA jilbab, cerita onlyfans terbaru, foto 3gp, Bbokep kecil, remaja colmek, awek tetek gede Viral tante bohay, xxx, ngewe hijab, sange teman, film tocil telanjang, artis squirt colmek, bokepbaru SMP, video anak SMU, tempek indo, gambar bokep, perawat IGO, bokep terkini, toket toge, bocil memek viral dewasa ketagihan, Masturbasi puting susu siswi, pelajar indo streaming, kakak twitter, bocah ojol, hot51, meki, video bokep Bandung, adik bogel, dan pidio mabok.</p>
-    <p>Koleksi kami juga mencakup berbagai kategori unik seperti Guru Baru, Film Bugil, SMP viral, Idaman Horni Ayah, Cindo Porno, Bokep Semi, Semi Hijab, Nonton Sebokep Online, Sma Ngewe, China Gojek, rare mabuk ometv, Asia Perawan, Ukhti Mandi Vcs, Cewek Ngentot, ABG Xbokep {video.title} Cantik Ngentot, Cina Seks, Video Sex. Selain itu, tersedia kumpulan live doodstream, adegan crot dalam, RuangBokep Tante Bohai, Anal Jablay Seksi, Toket Cewek Sange, Ngangkang Tobrut Jepang, Cewe No Sensor, Gangbang Terbaru, Sub Indo Prank, JAV HD, JAV no sensor, dan {nama} Wiki Mango Tanpa Sensor. Unduh bokep terlengkap sekarang!
-      {videoTags.length > 0 && (
-        <span style="font-weight: normal; font-style: italic;"> Temukan juga dengan tags terkait: {videoTags.join(', ')}.</span>
+    <p>Koleksi kami juga mencakup berbagai kategori unik seperti Guru Baru, Film Bugil, SMP viral, Idaman Horni Ayah, Cindo Porno, Bokep Semi, Semi Hijab, Nonton Sebokep Online, Sma Ngewe, China Gojek, rare mabuk ometv, Asia Perawan, Ukhti Mandi Vcs, Cewek Ngentot, ABG Xbokep {video.title} Cantik Ngentot, Cina Seks, Video Sex. Selain itu, tersedia kumpulan live doodstream, adegan crot dalam, RuangBokep Tante Bohai, Anal Jablay Seksi, Toket Cewek Sange, Ngangkang Tobrut Jepang, Cewe No Sensor, Gangbang Terbaru, Sub Indo Prank, JAV HD, JAV no sensor, dan {nama} Wiki Mango Tanpa Sensor. Unduh bokep terlengkap sekarang! {videoTags.length > 0 && ( <span style="font-weight: normal; font-style: italic;"> Temukan juga dengan tags terkait: {videoTags.join(', ')}.</span>
       )}
     </p>
   </div>
-  <button id="toggleFullDescription" class="toggle-description-button">
-    Tampilkan Deskripsi Lengkap
-  </button>
+  <button id="toggleFullDescription" class="toggle-description-button">Tampilkan Deskripsi Lengkap</button>
 </div>
 {videoTags.length > 0 && (
       <section class="video-tags-section">
