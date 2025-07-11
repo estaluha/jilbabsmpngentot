@@ -1,13 +1,66 @@
 ---
-// src/pages/404.astro
-import Layout from '../layouts/BaseLayout.astro';
-import { nama, url } from '../utils/site';
-
+// src/pages/category/index.astro
+import Layout from '../../layouts/BaseLayout.astro';
+import { getAllVideos, type VideoData } from '../../utils/data';
+import { slugify } from '../../utils/slugify';
 export const prerender = true;
+import { desk, nama, url, terbit } from '../../utils/site';
+
+const allVideos: VideoData[] = await getAllVideos();
+
+const categoryData: { [key: string]: { count: number; thumbnails: string[]; } } = {};
+const allThumbnailDomains = new Set<string>();
+
+allVideos.forEach(video => {
+  // --- BARIS VALIDASI DITAMBAHKAN DI SINI ---
+  // Pastikan video.category adalah string yang tidak kosong sebelum melanjutkan
+  if (typeof video.category !== 'string' || video.category.trim() === '') {
+    console.warn(`[WARNING] Melewatkan video ID ${video.id || 'Unknown'} karena kategori tidak valid atau kosong: '${video.category}'`);
+    return; // Lewati video ini dan lanjutkan ke yang berikutnya
+  }
+  // --- AKHIR BARIS VALIDASI ---
+
+  if (!categoryData[video.category]) {
+    categoryData[video.category] = {
+      count: 0,
+      thumbnails: []
+    };
+  }
+  categoryData[video.category].count++;
+
+  if (video.thumbnail) {
+    categoryData[video.category].thumbnails.push(video.thumbnail);
+    try {
+      allThumbnailDomains.add(new URL(video.thumbnail).origin);
+    } catch (e) {
+      console.error(`[ERROR] URL thumbnail tidak valid untuk video ID ${video.id || 'Unknown'} di koleksi data kategori:`, e);
+    }
+  }
+});
+
+const categories = Object.keys(categoryData)
+  .map(categoryName => {
+    const categoryInfo = categoryData[categoryName];
+    let selectedThumbnail: string | null = null;
+
+    if (categoryInfo.thumbnails.length > 0) {
+      const randomIndex = Math.floor(Math.random() * categoryInfo.thumbnails.length);
+      selectedThumbnail = categoryInfo.thumbnails[randomIndex];
+    }
+
+    return {
+      name: categoryName,
+      count: categoryInfo.count,
+      slug: slugify(categoryName), // slugify sekarang dijamin menerima string yang valid
+      thumbnail: selectedThumbnail
+    };
+  })
+  .sort((a, b) => a.name.localeCompare(b.name));
+
 
 const breadcrumbs = [
   { name: 'Home', url: `${url}` },
-  { name: 'Halaman Tidak Ditemukan' },
+  { name: 'Kategori' },
 ];
 
 const schemaBreadcrumb = {
@@ -21,44 +74,83 @@ const schemaBreadcrumb = {
   }))
 };
 
-const pageSchemas = [
-  schemaBreadcrumb
-];
+const schemaWebPage = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "url": `${url}/category/`,
+  "name": `Daftar Kategori Video - ${nama}`,
+  "description": `Jelajahi berbagai kategori video ${nama} terlengkap. Temukan video berdasarkan ${categories.slice(0, 3).map(cat => cat.name).join(', ')}${categories.length > 3 ? ', dan banyak kategori lainnya' : ''}.`,
+  "publisher": {
+    "@type": "Organization",
+    "name": nama,
+    "logo": {
+      "@type": "ImageObject",
+      "url": `${url}/logo.png`
+    }
+  },
+  "inLanguage": "id-ID",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": `${url}/category/`
+  }
+};
+
+// Buat string keywords yang relevan untuk halaman kategori
+const pageKeywords = `kategori video, daftar kategori, ${nama} kategori, nonton video gratis, ${categories.map(cat => cat.name).join(', ')}`;
+
 ---
 
 <Layout
-  title={`404 - Halaman Tidak Ditemukan | ${nama}`}
-  description={`Maaf, halaman yang Anda cari tidak dapat ditemukan di ${nama}.`}
+  title={`Daftar Kategori Video | ${nama} - Nonton Online Gratis`}
+  description={`Jelajahi berbagai kategori video ${nama} terlengkap. Temukan video berdasarkan ${categories.slice(0, 3).map(cat => cat.name).join(', ')}${categories.length > 3 ? ', dan banyak kategori lainnya' : ''}. Nonton online gratis sekarang!`}
   siteName={nama}
   siteUrl={url}
-  schemaJsonLd={pageSchemas}
->
-  <main class="not-found-page">
+  preconnectDomains={Array.from(allThumbnailDomains)} keywords={pageKeywords} >
+  <script type="application/ld+json" set:html={JSON.stringify(schemaBreadcrumb)} />
+  <script type="application/ld+json" set:html={JSON.stringify(schemaWebPage)} />
+
+  <main class="categories-list-page">
     <nav class="breadcrumb" aria-label="breadcrumb">
-      <ol>
+      <ol vocab="https://schema.org/" typeof="BreadcrumbList">
         {breadcrumbs.map((item, index) => (
-          <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-            {index > 0 && <span class="separator">/</span>}
+          <li property="itemListElement" typeof="ListItem">
+            {index > 0 && <span class="separator" aria-hidden="true">/</span>}
             {item.url ? (
-              <a itemprop="item" href={item.url}>
-                <span itemprop="name">{item.name}</span>
+              <a property="item" typeof="WebPage" href={item.url}>
+                <span property="name">{item.name}</span>
               </a>
             ) : (
-              <span itemprop="name">{item.name}</span>
+              <span property="name">{item.name}</span>
             )}
-            <meta itemprop="position" content={(index + 1).toString()} />
+            <meta property="position" content={(index + 1).toString()} />
           </li>
         ))}
       </ol>
     </nav>
 
-    <div class="not-found-content">
-      <h1 class="not-found-title">404</h1>
-      <p class="not-found-message">Maaf, halaman yang Anda cari tidak dapat ditemukan.</p>
-      <p class="not-found-suggestion">Mungkin URL-nya salah ketik atau halaman telah dipindahkan.</p>
-    </div>
-    
-    <a href="/" class="button-primary">Kembali ke Beranda</a>
+    <h1 class="page-title">Jelajahi Semua Kategori Video {nama} Terbaru</h1>
 
+    {categories.length === 0 ? (
+      <p class="no-categories">Tidak ada kategori video yang tersedia saat ini. Konten baru akan segera ditambahkan!</p>
+    ) : (
+      <div class="category-list">
+        {categories.map(category => (
+          <a href={`${url}/category/${category.slug}/1`} class="category-item" title={`Lihat semua video di kategori ${category.name}`}>
+            {category.thumbnail && (
+              <div class="category-thumbnail-wrapper">
+                <img
+                  src={category.thumbnail}
+                  alt={`Thumbnail untuk kategori ${category.name} di ${nama}`}
+                  title={`Video ${category.name} terbaru`}
+                  loading="lazy"
+                  width="300" height="169" />
+              </div>
+            )}
+            <h2 class="category-item-title">{category.name}</h2>
+            <p class="category-item-count">{category.count} Video</p>
+          </a>
+        ))}
+      </div>
+    )}
   </main>
 </Layout>
