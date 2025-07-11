@@ -10,7 +10,16 @@ const allVideos: VideoData[] = await getAllVideos();
 
 const categoryData: { [key: string]: { count: number; thumbnails: string[]; } } = {};
 const allThumbnailDomains = new Set<string>();
+
 allVideos.forEach(video => {
+  // --- BARIS VALIDASI DITAMBAHKAN DI SINI ---
+  // Pastikan video.category adalah string yang tidak kosong sebelum melanjutkan
+  if (typeof video.category !== 'string' || video.category.trim() === '') {
+    console.warn(`[WARNING] Melewatkan video ID ${video.id || 'Unknown'} karena kategori tidak valid atau kosong: '${video.category}'`);
+    return; // Lewati video ini dan lanjutkan ke yang berikutnya
+  }
+  // --- AKHIR BARIS VALIDASI ---
+
   if (!categoryData[video.category]) {
     categoryData[video.category] = {
       count: 0,
@@ -22,9 +31,9 @@ allVideos.forEach(video => {
   if (video.thumbnail) {
     categoryData[video.category].thumbnails.push(video.thumbnail);
     try {
-        allThumbnailDomains.add(new URL(video.thumbnail).origin);
+      allThumbnailDomains.add(new URL(video.thumbnail).origin);
     } catch (e) {
-        console.error(`[ERROR] Invalid thumbnail URL for video ID ${video.id} in category data collection:`, e);
+      console.error(`[ERROR] URL thumbnail tidak valid untuk video ID ${video.id || 'Unknown'} di koleksi data kategori:`, e);
     }
   }
 });
@@ -42,7 +51,7 @@ const categories = Object.keys(categoryData)
     return {
       name: categoryName,
       count: categoryInfo.count,
-      slug: slugify(categoryName),
+      slug: slugify(categoryName), // slugify sekarang dijamin menerima string yang valid
       thumbnail: selectedThumbnail
     };
   })
